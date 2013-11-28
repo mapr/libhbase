@@ -1,0 +1,14 @@
+.classpath
+.cproject
+.debug_dll
+.debug_exe
+.gradle
+.perf_test
+.project
+.settings
+build
+gradle-wrapper.properties
+gradle-wrapper.jar
+target
+*~
+*.patch
