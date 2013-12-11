@@ -9,7 +9,26 @@
   <groupId>com.mapr.hbase</groupId>
   <artifactId>libhbase</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>JNI bridge for HBase native library</name>
+  <packaging>jar</packaging>
+
+  <name>HBase Native Library</name>
+  <url>https://github.com/mapr/libhbase/</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Aditya Kishore</name>
+      <email>aditya@mapr.com</email>
+      <organization>MapR Technologies, Inc.</organization>
+      <organizationUrl>http://www.mapr.com/</organizationUrl>
+    </developer>
+  </developers>
 
   <repositories>
     <repository>
@@ -30,7 +49,6 @@
   </properties>
 
   <build>
-
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -49,6 +67,32 @@
                 <javahClassName>org.apache.hadoop.hbase.jni.CallbackHandlers</javahClassName>
               </javahClassNames>
               <javahOutputDirectory>${project.build.directory}/native/javah</javahOutputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.2.1</version>
+        <executions>
+          <execution>
+            <id>build-libhbase-binaries</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <executable>bash</executable>
+              <workingDirectory>${basedir}</workingDirectory>
+              <arguments>
+                <argument>gradlew</argument>
+                <argument>hbase</argument>
+                <argument>perftest</argument>
+                <argument>-PbuildDir=${project.build.directory}/gradle</argument>
+                <argument>-PjniIncludeDir=${project.build.directory}/native/javah</argument>
+              </arguments>
             </configuration>
           </execution>
         </executions>

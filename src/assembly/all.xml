@@ -23,12 +23,46 @@
   <id>bin</id>
   <formats>
     <format>dir</format>
+    <format>tar.gz</format>
   </formats>
   <baseDirectory>${project.build.directory}</baseDirectory>
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
+      <includes>
+        <include>${basedir}/*.txt</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>bin</directory>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/gradle/binaries/hbaseSharedLibrary</directory>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+      <outputDirectory>lib/native</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/gradle/binaries/perftestExecutable</directory>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+      <outputDirectory>lib/native</outputDirectory>
+    </fileSet>
+    <fileSet>
       <directory>conf</directory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/native/include</directory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+      <outputDirectory>include</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/examples</directory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
