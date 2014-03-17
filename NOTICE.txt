@@ -1,0 +1,10 @@
+This product includes software developed by The Apache Software
+Foundation (http://www.apache.org/).
+
+In addition, this product includes software developed by:
+
+AsyncHBase (https://github.com/OpenTSDB/asynchbase) is a fully asynchronous,
+non-blocking, thread-safe, high-performance HBase client.
+
+Gradle (http://www.gradle.org/) is used to build the native HBase library
+under ASL v2.0. See http://www.gradle.org/license.
