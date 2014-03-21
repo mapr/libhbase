@@ -36,7 +36,7 @@ Flusher::Run() {
     uint64_t rpcsSent = statKeeper_->GetBufferableOpsCount();
     if ((rpcsSent - rpcsSentLast) > flushBatchSize_) {
       uint64_t startTime = currentTimeMicroSeconds();
-      HBASE_LOG_DEBUG("Flushing after %"PRIu64" rpcs.", rpcsSent);
+      HBASE_LOG_DEBUG("Flushing after %" PRIu64 " rpcs.", rpcsSent);
       flush_client_and_wait(client_);
       uint64_t endTime = currentTimeMicroSeconds();
       rpcsSentLast = rpcsSent;
@@ -44,7 +44,7 @@ Flusher::Run() {
           (endTime - startTime), StatKeeper::OP_FLUSH, false);
     }
   }
-  HBASE_LOG_INFO("Stopping Flush thread (0x%08x) after %"PRIu64" rpcs.",
+  HBASE_LOG_INFO("Stopping Flush thread (0x%08x) after %" PRIu64 " rpcs.",
       Id(), statKeeper_->GetBufferableOpsCount());
   return NULL;
 }

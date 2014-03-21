@@ -46,10 +46,34 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <gtest.version>1.7.0</gtest.version>
+    <gtest.md5>2d6ec8ccdf5c46b05ba54a9fd1d130d7</gtest.md5>
   </properties>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>com.googlecode.maven-download-plugin</groupId>
+        <artifactId>maven-download-plugin</artifactId>
+        <version>1.1.0</version>
+        <executions>
+          <execution>
+            <id>download-gtest</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>wget</goal>
+            </goals>
+            <inherited>false</inherited>
+            <configuration>
+              <skip>${maven.test.skip}</skip>
+              <url>http://googletest.googlecode.com/files/gtest-${gtest.version}.zip</url>
+              <unpack>true</unpack>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <md5>${gtest.md5}</md5>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>native-maven-plugin</artifactId>
@@ -67,32 +91,6 @@
                 <javahClassName>org.apache.hadoop.hbase.jni.CallbackHandlers</javahClassName>
               </javahClassNames>
               <javahOutputDirectory>${project.build.directory}/native/javah</javahOutputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
-        <executions>
-          <execution>
-            <id>build-libhbase-binaries</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-            <configuration>
-              <executable>bash</executable>
-              <workingDirectory>${basedir}</workingDirectory>
-              <arguments>
-                <argument>gradlew</argument>
-                <argument>hbase</argument>
-                <argument>perftest</argument>
-                <argument>-PbuildDir=${project.build.directory}/gradle</argument>
-                <argument>-PjniIncludeDir=${project.build.directory}/native/javah</argument>
-              </arguments>
             </configuration>
           </execution>
         </executions>
@@ -119,11 +117,92 @@
         </configuration>
         <executions>
           <execution>
-            <id>tarball</id>
+            <id>build-tarball</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version><!--$NO-MVN-MAN-VER$-->
+        <executions>
+          <execution>
+            <id>build-libhbase-binaries</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <inherited>false</inherited>
+            <configuration>
+              <target>
+                <echo message="Building libHBase..."/>
+                <exec executable="bash" failonerror="true" dir="${basedir}">
+                  <arg value="gradlew" />
+                  <arg value="hbase" />
+                  <arg value="perftest" />
+                  <arg value="-PbuildDir=${project.build.directory}/gradle" />
+                  <arg value="-PjniIncludeDir=${project.build.directory}/native/javah" />
+                </exec>
+              </target>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>build-libhbase-tests</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <inherited>false</inherited>
+            <configuration>
+              <skip>${maven.test.skip}</skip>
+              <target unless="skipTests">
+                <echo message="Building GTest..."/>
+                <exec executable="cmake" failonerror="true"
+                      dir="${project.build.directory}/gtest-${gtest.version}">
+                  <arg value="-DBUILD_SHARED_LIBS=ON"/>
+                  <arg value="-GUnix Makefiles"/>
+                  <arg value="."/>
+                </exec>
+                <exec executable="make" failonerror="true"
+                      dir="${project.build.directory}/gtest-${gtest.version}">
+                  <arg value="gtest"/>
+                </exec>
+                <echo message="Building libHBase unit tests..."/>
+                <exec executable="bash" failonerror="true" dir="${basedir}">
+                  <arg value="gradlew" />
+                  <arg value="unittests" />
+                  <arg value="-PbuildDir=${project.build.directory}/gradle" />
+                  <arg value="-PgoogleTestDir=${project.build.directory}/gtest-${gtest.version}" />
+                </exec>
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>run-libhbase-unittests</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <inherited>false</inherited>
+            <configuration>
+              <skip>${maven.test.skip}</skip>
+              <target unless="skipTests">
+                <echo message="Running libHBase unit tests..."/>
+                <exec executable="${project.build.directory}/gradle/binaries/unittestsExecutable/unittests"
+                      failonerror="true" dir="${basedir}">
+                  <env key="PATH" path="${env.PATH}:${java.home}/bin/server:${project.build.directory}/gtest-${gtest.version}:${project.build.directory}/${project.build.finalName}/lib/native"/>
+                  <env key="LD_LIBRARY_PATH" path="${env.LD_LIBRARY_PATH}:${java.home}/lib/${os.arch}/server:${project.build.directory}/gtest-${gtest.version}:${project.build.directory}/${project.build.finalName}/lib/native"/>
+                  <env key="HBASE_CONF_DIR" file="${project.build.directory}/${project.build.finalName}/conf"/>
+                  <env key="HBASE_LIB_DIR" file="${project.build.directory}/${project.build.finalName}/lib"/>
+                  <env key="LIBHBASE_OPTS" value="-Dlibhbase.log.dir=${project.build.directory}/test-logs -Dlibhbase.log.name=unittests_java.log -Dlibhbase.logger=RFA -Dlibhbase.log.level=info"/>
+                </exec>
+              </target>
+            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -151,6 +230,21 @@
                   </pluginExecutionFilter>
                   <action>
                     <ignore />
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>
+                      com.googlecode.maven-download-plugin
+                    </groupId>
+                    <artifactId>maven-download-plugin</artifactId>
+                    <versionRange>[1.1.0,)</versionRange>
+                    <goals>
+                      <goal>wget</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
                   </action>
                 </pluginExecution>
               </pluginExecutions>

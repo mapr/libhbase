@@ -162,12 +162,12 @@ StatKeeper::Run() {
       fflush(stdout);
     }
 
-    fprintf(stdout, "%02d:%02d:%02d %5d %9"PRIu64" %6"PRIu64"",
+    fprintf(stdout, "%02d:%02d:%02d %5d %9" PRIu64 " %6" PRIu64 "",
             hour, min, secs, nsec, totalOps, totalOpsLastSec);
     for (int i = 0; i < OP_LAST; ++i) {
       uint64_t numOpsForOp = op_[i]->numOps_;
       if (!numOpsForOp) continue;
-      fprintf(stdout, "|%9"PRIu64" %6"PRIu64" %8"PRIu64" %8"PRIu64" %8"PRIu64"",
+      fprintf(stdout, "|%9" PRIu64 " %6" PRIu64 " %8" PRIu64 " %8" PRIu64 " %8" PRIu64 "",
               numOpsForOp, currentNumOps[i],
               (op_[i]->cumLatencyOps_ / (numOpsForOp ? numOpsForOp : 1)),
               op_[i]->maxLatencyOps_, op_[i]->minLatencyOps_);
@@ -189,9 +189,9 @@ StatKeeper::PrintSummary() {
     uint64_t numOpsForOp = op_[i]->numOps_;
     if (!numOpsForOp) continue;
     uint64_t runTimeForOp = (op_[i]->opsEndTime_ - op_[i]->opsStartTime_)/1000000;
-    fprintf(stdout, "[%5s] %10"PRIu64" Ops, %"PRIu64" Secs, %"PRIu64" ops/s. "
-            "Success: %"PRIu64", Failures: %"PRIu64". "
-            "Latency(us): avg %"PRIu64", max %"PRIu64", min %"PRIu64".\n",
+    fprintf(stdout, "[%5s] %10" PRIu64 " Ops, %" PRIu64 " Secs, %" PRIu64 " ops/s. "
+            "Success: %" PRIu64 ", Failures: %" PRIu64 ". "
+            "Latency(us): avg %" PRIu64 ", max %" PRIu64 ", min %" PRIu64 ".\n",
             op_[i]->name_, numOpsForOp, runTimeForOp, (numOpsForOp/runTimeForOp),
             op_[i]->success_, op_[i]->failure_,
             (op_[i]->cumLatencyOps_ / (numOpsForOp ? numOpsForOp : 1)),

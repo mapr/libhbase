@@ -15,8 +15,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#ifndef FLUSH_OPS_H_
-#define FLUSH_OPS_H_
+#ifndef HBASE_TESTS_FLUSH_OPS_H_
+#define HBASE_TESTS_FLUSH_OPS_H_
 
 #include <hbase/hbase.h>
 
@@ -49,4 +49,4 @@ private:
 } /* namespace test */
 } /* namespace hbase */
 
-#endif /* FLUSH_OPS_H_ */
+#endif /* HBASE_TESTS_FLUSH_OPS_H_ */

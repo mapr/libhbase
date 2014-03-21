@@ -70,7 +70,7 @@ if $cygwin; then
 fi
 
 #This is passed to JVM by libhbase
-LIBHBASE_OPTS="${LIBHBASE_OPTS} -Dlibhbase.log.dir=${LIBHBASE_HOME}/logs -Dlibhbase.log.name=perftest-java.log"
+LIBHBASE_OPTS="${LIBHBASE_OPTS} -Dlibhbase.log.dir=${LIBHBASE_HOME}/logs -Dlibhbase.log.name=perftest-java.log -Dlibhbase.log.level=info -Dlibhbase.logger=RFA"
 LIBHBASE_OPTS="${LIBHBASE_OPTS} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/ -XX:+UseConcMarkSweepGC -XX:+UseParNewGC"
 
 export LIBHBASE_OPTS=${LIBHBASE_OPTS}

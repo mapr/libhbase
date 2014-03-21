@@ -21,7 +21,7 @@ import org.gradle.internal.os.OperatingSystem
 apply plugin: 'c'
 apply plugin: 'cpp'
 
-defaultTasks "hbase", "perftest", "example_async"
+defaultTasks "hbase", "perftest", "example_async", "unittests"
 
 ext {
   currentJvm = org.gradle.internal.jvm.Jvm.current()
@@ -32,10 +32,12 @@ ext {
   if (osName.contains('linux')) {
     javaHomeIncludeOs = javaHomeInclude + '/linux'
     libjvmLibraryString = javaHome + "/jre/lib/amd64/server/libjvm.so"
+    libGTestName = "/libgtest.so"
   }
   else if (osName.contains('windows')) {
     javaHomeIncludeOs = javaHomeInclude + '/win32'
     libjvmLibraryString = javaHome + "/lib/jvm.lib"
+    libGTestName = "/cyggtest.dll"
   }
   else if (osName.contains('mac os x')) {
     // TODO - deal with different versions of OSX,
@@ -43,11 +45,15 @@ ext {
     javaHomeInclude = "/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers"
     javaHomeIncludeOs = "/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers"
     libjvmLibraryString = "/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Libraries/libserver.dylib"
+    libGTestName = "/libgtest.dylib"
   }
 
   // this should be set to the directory of JNI generated headers
   if (!project.hasProperty('jniIncludeDir')) {
     jniIncludeDir = "src/main/native/generated"
+  }
+  if (!project.hasProperty('googleTestDir')) {
+    googleTestDir = "target/gtest-1.7.0"
   }
 }
 
@@ -83,6 +89,12 @@ model {
       jvm {
         binaries.withType(SharedLibraryBinary) {
           sharedLibraryFile = file(libjvmLibraryString)
+        }
+      }
+
+      gtest {
+        binaries.withType(SharedLibraryBinary) {
+          sharedLibraryFile = file(googleTestDir + libGTestName)
         }
       }
     }
@@ -127,6 +139,18 @@ sources {
       }
       exportedHeaders {
         srcDirs "src/test/native/common"
+      }
+    }
+  }
+   /* unittests sources */
+  unittests {
+    cpp {
+      source {
+        srcDirs "src/test/native/unittests",  "src/test/native/common"
+        include "**/*.cc"
+      }
+      exportedHeaders {
+        srcDirs "src/test/native/common",  googleTestDir + "/include"
       }
     }
   }
@@ -204,6 +228,14 @@ executables {
       lib library: 'hbase', linkage: 'shared'
     }
   }
+
+   unittests {
+    binaries.all {
+      cppCompiler.args "-std=gnu++0x"
+      lib library: 'hbase', linkage: 'shared'
+      lib library: 'gtest', linkage: 'shared'
+    }
+  }
 }
 
 /*
@@ -224,4 +256,8 @@ task 'perftest' (dependsOn: 'perftestExecutable') {
 
 task 'example_async' (dependsOn: 'example_asyncExecutable') {
   description 'Builds async example executable.'
+}
+
+task 'unittests' (dependsOn: 'unittestsExecutable') {
+  description 'Builds unittests executable.'
 }

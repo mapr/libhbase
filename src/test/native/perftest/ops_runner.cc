@@ -206,7 +206,7 @@ void*
 OpsRunner::Run() {
   uint64_t endRow = startRow_ + numOps_;
   HBASE_LOG_INFO("Starting OpsRunner(0x%08x) for start row %"
-      PRIu64", operation count %"PRIu64".", Id(), startRow_, numOps_);
+      PRIu64 ", operation count %" PRIu64 ".", Id(), startRow_, numOps_);
 
   double rand_max = RAND_MAX;
   for (uint64_t row = startRow_; row < endRow; ++row) {
