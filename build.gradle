@@ -44,14 +44,15 @@ ext {
     // because Apple has done heavy modification to the JVM and JDK every version
     javaHomeInclude = "/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers"
     javaHomeIncludeOs = "/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers"
-    libjvmLibraryString = "/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Libraries/libserver.dylib"
+    //libjvmLibraryString = "/System/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Libraries/libserver.dylib"
+    libjvmLibraryString = "/System/Library/Frameworks/JavaVM.framework/Versions/Current/JavaVM"
     libGTestName = "/libgtest.dylib"
   }
 
   // this should be set to the directory of JNI generated headers
-  if (!project.hasProperty('jniIncludeDir')) {
+  //if (!project.hasProperty('jniIncludeDir')) {
     jniIncludeDir = "src/main/native/generated"
-  }
+  //}
   if (!project.hasProperty('googleTestDir')) {
     googleTestDir = "target/gtest-1.7.0"
   }
@@ -183,8 +184,8 @@ sources {
  */
 binaries.all {
   if (toolChain in Gcc) {
-    cCompiler.args "-Wall", "-Werror", "-fvisibility=hidden", "-std=gnu99"
-    cppCompiler.args "-Wall", "-Werror", "-fvisibility=hidden", "-fvisibility-inlines-hidden"
+    cCompiler.args "-Wall", "-fpermissive", "-fvisibility=hidden", "-std=gnu99"
+    cppCompiler.args "-Wall", "-fpermissive", "-fvisibility=hidden", "-fvisibility-inlines-hidden"
 
     lib library: 'jvm', linkage: 'shared'
     if (OperatingSystem.current().windows) {
