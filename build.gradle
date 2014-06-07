@@ -184,8 +184,8 @@ sources {
  */
 binaries.all {
   if (toolChain in Gcc) {
-    cCompiler.args "-Wall", "-fpermissive", "-fvisibility=hidden", "-std=gnu99"
-    cppCompiler.args "-Wall", "-fpermissive", "-fvisibility=hidden", "-fvisibility-inlines-hidden"
+    cCompiler.args "-Wall", "-Wno-deprecated-declarations", "-Werror", "-fvisibility=hidden", "-std=gnu99"
+    cppCompiler.args "-Wall", "-Wno-deprecated-declarations", "-Werror", "-fvisibility=hidden", "-fvisibility-inlines-hidden"
 
     lib library: 'jvm', linkage: 'shared'
     if (OperatingSystem.current().windows) {

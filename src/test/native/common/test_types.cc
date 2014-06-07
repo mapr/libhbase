@@ -51,7 +51,7 @@ TaskRunner::Stop() {
 void*
 TaskRunner::ThreadFunction(void* arg) {
   TaskRunner* runner = (TaskRunner*) (arg);
-  runner->tid_ = (uint32_t) (pthread_self());
+  runner->tid_ = pthread_self();
   return runner->Run();
 }
 
