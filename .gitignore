@@ -12,5 +12,3 @@ gradle-wrapper.jar
 target
 *~
 *.patch
-gradle/tmp
-gradle/binaries
