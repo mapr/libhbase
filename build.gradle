@@ -243,7 +243,7 @@ executables {
  */
 task wrapper(type: Wrapper) {
   description 'A wrapper which downloads and/or uses Gradle'
-  gradleVersion = '1.12-20140310230028+0000' // using a nightly build
+  gradleVersion = '1.12'
 }
 
 task 'hbase' (dependsOn: 'hbaseSharedLibrary') {
