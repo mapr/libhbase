@@ -53,11 +53,12 @@ HBASE_NATIVE_DIR=${LIBHBASE_HOME}/lib/native
 
 HBASE_LIBRARY_PATH="$HBASE_LIBRARY_PATH:${HBASE_NATIVE_DIR}"
 #Add libjvm.so's location
-if [ -d "$JAVA_HOME/jre/lib/amd64/server" ]; then
+if [ -d "$JAVA_HOME/jre/lib/amd64/server" ]; then # Oracle Java
   HBASE_LIBRARY_PATH="$HBASE_LIBRARY_PATH:$JAVA_HOME/jre/lib/amd64/server"
-fi
-if [ -d "$JAVA_HOME/jre/lib/i386/server" ]; then
-  HBASE_LIBRARY_PATH="$HBASE_LIBRARY_PATH:$JAVA_HOME/jre/lib/i386/server"
+elif [ -d "$JAVA_HOME/jre/lib/amd64/default" ]; then # IBM Java
+  HBASE_LIBRARY_PATH="$HBASE_LIBRARY_PATH:$JAVA_HOME/jre/lib/amd64/default"
+elif [ -d "$JAVA_HOME/jre/lib/i386/server" ]; then
+  HBASE_LIBRARY_PATH="$HBASE_LIBRARY_PATH:$JAVA_HOME/jre/lib/i386/server"  
 fi
 LD_LIBRARY_PATH="${HBASE_LIBRARY_PATH#:}"
 
@@ -76,6 +77,7 @@ LIBHBASE_OPTS="${LIBHBASE_OPTS} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath
 export LIBHBASE_OPTS=${LIBHBASE_OPTS}
 export HBASE_LIB_DIR=${HBASE_LIB_DIR}
 export HBASE_CONF_DIR=${LIBHBASE_HOME}/conf
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
 
 if [ $# -ne 0 ]; then
   mkdir -p ${LIBHBASE_HOME}/logs

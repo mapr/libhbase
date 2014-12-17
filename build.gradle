@@ -31,7 +31,15 @@ ext {
   String osName = System.properties['os.name'].toLowerCase()
   if (osName.contains('linux')) {
     javaHomeIncludeOs = javaHomeInclude + '/linux'
-    libjvmLibraryString = javaHome + "/jre/lib/amd64/server/libjvm.so"
+    libjvmLibraryStringOracle = javaHome + "/jre/lib/amd64/server/libjvm.so"
+    libjvmLibraryStringIBM = javaHome + "/jre/lib/amd64/default/libjvm.so"
+    if (file(libjvmLibraryStringOracle).exists()) {
+      libjvmLibraryString = libjvmLibraryStringOracle
+    } else if (file(libjvmLibraryStringIBM).exists()) {
+      libjvmLibraryString = libjvmLibraryStringIBM
+    } else {
+      throw new GradleException("The file 'libjvm.so' could not be located.")
+    }
     libGTestName = "/libgtest.so"
   }
   else if (osName.contains('windows')) {
@@ -57,21 +65,6 @@ ext {
   }
 }
 
-def stdout = new ByteArrayOutputStream()
-try {
-  exec {
-    commandLine(
-        "ls", libjvmLibraryString
-        )
-    errorOutput = stdout
-    standardOutput = stdout
-    ignoreExitValue = false
-    logger.info("Using ${libjvmLibraryString} and include directories ${javaHomeInclude} and ${javaHomeIncludeOs}")
-  }
-} catch(e){
-    logger.error(stdout.toString())
-    throw new GradleException("The file ${libjvmLibraryString} was not found")
-}
 
 model {
   toolChains {
@@ -187,6 +180,8 @@ binaries.all {
     cppCompiler.args "-Wall", "-Werror", "-fvisibility=hidden", "-fvisibility-inlines-hidden"
 
     lib library: 'jvm', linkage: 'shared'
+    linker.args "-ldl"
+    linker.args "-lpthread"
     if (OperatingSystem.current().windows) {
       // Without this, the linker decorate the JNIEXPORTs and then JNI can not find them
       linker.args "-Wl,--kill-at"

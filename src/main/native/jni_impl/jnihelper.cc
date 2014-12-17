@@ -40,6 +40,12 @@
 #include "hbase_status.h"
 #include "jnihelper.h"
 
+#ifdef jniport_h // IBM Java
+#define SETBYTEARRAYREGIONCAST jbyte*
+#else
+#define SETBYTEARRAYREGIONCAST const jbyte*
+#endif
+
 namespace hbase {
 
 #ifdef __CYGWIN__
@@ -793,7 +799,7 @@ JniHelper::CreateJavaByteArray(
       result.SetCode(CheckException(env));
     } else {
       env->SetByteArrayRegion(
-          (jbyteArray)result.value.l, start, len, (const jbyte *)buf);
+          (jbyteArray)result.value.l, start, len, (SETBYTEARRAYREGIONCAST)buf);
     }
   }
   return result;
