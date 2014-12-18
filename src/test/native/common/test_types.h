@@ -71,12 +71,12 @@ public:
 protected:
   volatile bool Running() { return !stop_; }
 
-  uint32_t Id() { return tid_; }
+  pthread_t Id() { return tid_; }
 
   virtual void* Run() = 0;
 
 private:
-  uint32_t  tid_;
+  pthread_t  tid_;
 
   volatile bool stop_;
 

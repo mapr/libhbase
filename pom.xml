@@ -144,6 +144,10 @@
                   <arg value="gradlew" />
                   <arg value="hbase" />
                   <arg value="perftest" />
+                  <arg value="example_async" />
+                  <arg value="--info" />
+                  <arg value="--debug" />
+                  <arg value="--stacktrace" />
                   <arg value="-PbuildDir=${project.build.directory}/gradle" />
                   <arg value="-PjniIncludeDir=${project.build.directory}/native/javah" />
                 </exec>
